@@ -89,11 +89,16 @@ namespace ChooseC.Image.WaterMark.Core
                         false);
                     #endregion
                     // origin bitmap 
-                    var originBitmap = Bitmap.FromStream(stream);
+                    var originBitmap = FillImage(
+                        stream,
+                        GetColor(config.fillcolor),
+                        settings.exportsize,
+                        0);
+                    #region 计算绘制的图片大小
 
                     if (config.logmaxheight > 0)
                     {
-                        var maxheight = config.logmaxheight<=1 ? 
+                        var maxheight = config.logmaxheight <= 1 ?
                             (int)Math.Round(originBitmap.Height * config.logmaxheight, 0)
                             :
                             (int)config.logmaxheight;
@@ -106,11 +111,15 @@ namespace ChooseC.Image.WaterMark.Core
                             topBitmap = new Bitmap(topBitmap, resize);
                         }
                     }
-                    var totalHeight = originBitmap.Height + (topBitmap == null ? 0 : topBitmap.Height) + (bottomBitmap == null ? 0 : bottomBitmap.Height);
+                    var totalHeight = originBitmap.Height 
+                        + (topBitmap == null ? 0 : topBitmap.Height) 
+                        + (bottomBitmap == null ? 0 : bottomBitmap.Height)
+                        + settings.bottommargin;
                     var totalWidth = Math.Max(
                         Math.Max(originBitmap.Width, topBitmap == null ? 0 : topBitmap.Height),
                         bottomBitmap == null ? 0 : bottomBitmap.Height);
                     Bitmap exportBitmap = new Bitmap(totalWidth, totalHeight);
+                    #endregion
 
                     #region 绘制
                     Graphics graphics = Graphics.FromImage(exportBitmap);
@@ -125,19 +134,22 @@ namespace ChooseC.Image.WaterMark.Core
                     //背景设置白色
                     graphics.Clear(GetColor(config.fillcolor));
                     #endregion
-                    var x =( totalWidth - originBitmap.Width) / 2;
+                    var x = (totalWidth - originBitmap.Width) / 2;
                     var y = 0;
                     graphics.DrawImage(originBitmap, x, y, originBitmap.Width, originBitmap.Height);
                     if (topBitmap is not null)
                     {
                         x = (originBitmap.Width - topBitmap.Width) / 2;
-                        y = originBitmap.Height;
+                        y = originBitmap.Height 
+                            + settings.bottommargin;
                         graphics.DrawImage(topBitmap, x, y, topBitmap.Width, topBitmap.Height);
                     }
                     if (bottomBitmap is not null)
                     {
                         x = (originBitmap.Width - bottomBitmap.Width) / 2;
-                        y = originBitmap.Height + (topBitmap == null ? 0 : topBitmap.Height);
+                        y = originBitmap.Height 
+                            + (topBitmap == null ? 0 : topBitmap.Height)
+                            + settings.bottommargin;
                         graphics.DrawImage(bottomBitmap, x, y, bottomBitmap.Width, bottomBitmap.Height);
                     }
 
@@ -153,7 +165,9 @@ namespace ChooseC.Image.WaterMark.Core
                     SaveImageFile(
                         exportBitmap,
                         fileinfo.Name.Replace(fileinfo.Extension, ""),
-                        settings.exporttype, exportfolder.FullName
+                        settings.exporttype,
+                        exportfolder.FullName,
+                        settings.exportquality
                         );
 
                     exportBitmap.Dispose();
@@ -375,9 +389,10 @@ namespace ChooseC.Image.WaterMark.Core
                     }
                     SaveImageFile(
                         exportBitmap,
-                        fileinfo.Name.Replace(fileinfo.Extension, ""), 
+                        fileinfo.Name.Replace(fileinfo.Extension, ""),
                         settings.exporttype,
-                        exportfolder.FullName
+                        exportfolder.FullName,
+                        settings.exportquality
                         );
 
                     exportBitmap.Dispose();
@@ -421,7 +436,7 @@ namespace ChooseC.Image.WaterMark.Core
                         rightinfoBitmap = null;
 
                     var logoFont = GetFont(
-                        config.wordlogofont.fontname, 
+                        config.wordlogofont.fontname,
                         config.wordlogofont.fontstyle,
                         config.wordlogofont.fontsize,
                         config.wordlogofont.fontunit
@@ -432,13 +447,13 @@ namespace ChooseC.Image.WaterMark.Core
                     switch (config.leftlogo)
                     {
                         case nameof(LogoTypeEnum.imglogo):
-                            var logofile = GetLogos(LogosFolder,camermake)?.FullName;
+                            var logofile = GetLogos(LogosFolder, camermake)?.FullName;
                             if (logofile is not null) leftBitmap = Bitmap.FromFile(logofile);
                             break;
                         case nameof(LogoTypeEnum.wordlogo):
                             leftBitmap = WaterMarkHelper.CreateWordImage(
                                 camermake,
-                                sf, 
+                                sf,
                                 logoFont,
                                 GetColor(config.fillcolor),
                                 GetColor(config.wordlogofont.fontcolor),
@@ -463,12 +478,12 @@ namespace ChooseC.Image.WaterMark.Core
                             break;
                         case nameof(LogoTypeEnum.wordlogo):
                             rightBitmap = WaterMarkHelper.CreateWordImage(
-                                camermake, 
-                                sf, 
+                                camermake,
+                                sf,
                                 logoFont,
                                 GetColor(config.fillcolor),
                                 GetColor(config.wordlogofont.fontcolor),
-                                10, 
+                                10,
                                 10,
                                 false);
                             break;
@@ -483,37 +498,37 @@ namespace ChooseC.Image.WaterMark.Core
                     var font = GetFont(
                         config.infofont.fontname,
                         config.infofont.fontstyle,
-                        config.infofont.fontsize, 
+                        config.infofont.fontsize,
                         config.infofont.fontunit
                         );
                     //info
                     var leftinfo = FormatterInfo(
-                        config.leftinfo, 
+                        config.leftinfo,
                         infoDict
                         );
                     var rightinfo = FormatterInfo(
-                        config.rightinfo, 
+                        config.rightinfo,
                         infoDict
                         );
                     //get left  info
                     leftinfoBitmap = WaterMarkHelper.CreateWordImage(
                         leftinfo,
-                        sf, 
+                        sf,
                         font,
                         GetColor(config.fillcolor),
                         GetColor(config.infofont.fontcolor),
-                        10, 
-                        10, 
+                        10,
+                        10,
                         leftBitmap != null);
                     //get right info
                     rightinfoBitmap = WaterMarkHelper.CreateWordImage(
-                        rightinfo, 
-                        sf, 
+                        rightinfo,
+                        sf,
                         font,
                         GetColor(config.fillcolor),
                         GetColor(config.infofont.fontcolor),
-                        10, 
-                        10, 
+                        10,
+                        10,
                         rightBitmap != null);
 
                     #region origin bitmap 
@@ -613,7 +628,8 @@ namespace ChooseC.Image.WaterMark.Core
                         exportBitmap,
                         fileinfo.Name.Replace(fileinfo.Extension, ""),
                         settings.exporttype,
-                        exportfolder.FullName
+                        exportfolder.FullName,
+                        settings.exportquality
                         );
 
                     exportBitmap.Dispose();
@@ -637,7 +653,7 @@ namespace ChooseC.Image.WaterMark.Core
         /// <param name="settings"></param>
         /// <param name="direction"></param>
         /// <param name="exportfolder"></param>
-        public static void CreateWaterMark_OnlyFill(FileInfo fileinfo, Settings settings, DrawDirectionEnum direction, DirectoryInfo exportfolder,Size exportSize)
+        public static void CreateWaterMark_OnlyFill(FileInfo fileinfo, Settings settings, DrawDirectionEnum direction, DirectoryInfo exportfolder, Size exportSize)
         {
             try
             {
@@ -646,7 +662,7 @@ namespace ChooseC.Image.WaterMark.Core
                 {
                     var bitmap = WaterMarkHelper.FillImage(
                         stream,
-                        GetColor(config.fillcolor), 
+                        GetColor(config.fillcolor),
                         exportSize,
                         config.fillratio);
 
@@ -657,10 +673,11 @@ namespace ChooseC.Image.WaterMark.Core
                         exportfolder = new DirectoryInfo(outPath);
                     }
                     SaveImageFile(
-                        bitmap, 
-                        fileinfo.Name.Replace(fileinfo.Extension, ""), 
+                        bitmap,
+                        fileinfo.Name.Replace(fileinfo.Extension, ""),
                         settings.exporttype,
-                        exportfolder.FullName
+                        exportfolder.FullName,
+                        settings.exportquality
                         );
                     bitmap.Dispose();
                 }
@@ -684,7 +701,7 @@ namespace ChooseC.Image.WaterMark.Core
         /// <param name="topPadding">上下间距</param>
         /// <param name="splitLineFlag">是否分割线</param>
         /// <returns></returns>
-        public static Bitmap CreateWordImage(string word, StringFormat sf, Font font, Color fillcolor,Color pencolor, int leftPadding = 10, int topPadding = 10, bool splitLineFlag = false)
+        public static Bitmap CreateWordImage(string word, StringFormat sf, Font font, Color fillcolor, Color pencolor, int leftPadding = 10, int topPadding = 10, bool splitLineFlag = false)
         {
             try
             {
@@ -724,7 +741,7 @@ namespace ChooseC.Image.WaterMark.Core
                 }
                 graphics.Flush();
 
-                SaveImageFile(bitmap, $"info", ImageFormat.Jpeg, Path.Combine(AppContext.BaseDirectory,"infoExport"));
+                //SaveImageFile(bitmap, "info", ImageFormat.Jpeg, Path.Combine(AppContext.BaseDirectory,"infoExport"));
 
                 return bitmap;
             }
@@ -759,37 +776,35 @@ namespace ChooseC.Image.WaterMark.Core
         /// </summary>
         /// <param name="stream"></param>
         /// <param name="fillcolor"></param>
-        /// <param name="size"></param>
+        /// <param name="targetSize"></param>
         /// <param name="fillratio"></param>
         /// <returns></returns>
-        public static Bitmap FillImage(Stream stream, Color fillcolor, Size size, double fillratio = 0.1)
+        public static Bitmap FillImage(Stream stream, Color fillcolor, Size targetSize, double fillratio = 0.1)
         {
             try
             {
-                var image = System.Drawing.Image.FromStream(stream);
-                if (size == Size.Empty || size == image.Size)
+                var image = Bitmap.FromStream(stream);
+                if (targetSize == Size.Empty || targetSize == image.Size)
                 {
-                    size = image.Size;
-                    using Bitmap bitmap = new Bitmap(size.Width, size.Height);
-
+                    targetSize = image.Size;
+                    Bitmap bitmap = new Bitmap(targetSize.Width, targetSize.Height);
                     using Graphics graphics = Graphics.FromImage(bitmap);
                     //图像质量
                     graphics.CompositingQuality = CompositingQuality.HighQuality;
                     graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
                     graphics.SmoothingMode = SmoothingMode.HighQuality;
                     graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                    //背景设置白色
-                    graphics.Clear(Color.White);
+                    //背景设置
+                    graphics.Clear(fillcolor);
 
                     //计算坐标 (默认原图缩放10%的空间为空白填充)
-                    var x = (int)Math.Ceiling(size.Width * fillratio / 2);
-                    var y = (int)Math.Ceiling(size.Height * fillratio / 2);
-
+                    var x = (int)Math.Ceiling(targetSize.Width * fillratio / 2);
+                    var y = (int)Math.Ceiling(targetSize.Height * fillratio / 2);
                     graphics.DrawImage(image,
                                        x,
                                        y,
-                                       (size.Width - (x * 2)),
-                                       (size.Height - (y * 2)));
+                                       (targetSize.Width - (x * 2)),
+                                       (targetSize.Height - (y * 2)));
                     graphics.Flush();
                     graphics.Dispose();
 
@@ -797,8 +812,24 @@ namespace ChooseC.Image.WaterMark.Core
                 }
                 else
                 {
-
-                    using Bitmap bitmap = new Bitmap(size.Width, size.Height);
+                    var originRatio = (double)image.Width / image.Height;
+                    if (targetSize.Width > 0 && targetSize.Height <= 0)
+                    {
+                        targetSize = new Size()
+                        {
+                            Width = targetSize.Width,
+                            Height = (int)Math.Round(targetSize.Width / originRatio, 0)
+                        };
+                    }
+                    else if (targetSize.Width <= 0 && targetSize.Height > 0)
+                    {
+                        targetSize = new Size()
+                        {
+                            Width = (int)Math.Round(targetSize.Height * originRatio, 0),
+                            Height = targetSize.Height
+                        };
+                    }
+                    Bitmap bitmap = new Bitmap(targetSize.Width, targetSize.Height);
                     using Graphics graphics = Graphics.FromImage(bitmap);
                     //图像质量
                     graphics.CompositingQuality = CompositingQuality.HighQuality;
@@ -806,20 +837,20 @@ namespace ChooseC.Image.WaterMark.Core
                     graphics.SmoothingMode = SmoothingMode.HighQuality;
                     graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
                     //背景设置白色
-                    graphics.Clear(Color.White);
+                    graphics.Clear(fillcolor);
 
                     //计算绘制的图像大小
-                    ComputerKeepRatioZoomSize(image.Size, size, out Size ZoomSize);
+                    var scaleSize = ComputerMaxScaleSize(image.Size, targetSize);
                     //计算坐标 (默认原图缩放10%的空间为空白填充)
 
-                    var x = (int)Math.Ceiling(((double)size.Width - ZoomSize.Width) / 2);
-                    var y = (int)Math.Ceiling((double)(size.Height - ZoomSize.Height) / 2);
+                    var x = (int)Math.Ceiling(((double)targetSize.Width - scaleSize.Width) / 2);
+                    var y = (int)Math.Ceiling((double)(targetSize.Height - scaleSize.Height) / 2);
 
                     graphics.DrawImage(image,
                                        x,
                                        y,
-                                       ZoomSize.Width,
-                                       ZoomSize.Height);
+                                       scaleSize.Width,
+                                       scaleSize.Height);
                     graphics.Flush();
                     graphics.Dispose();
 
@@ -834,70 +865,8 @@ namespace ChooseC.Image.WaterMark.Core
             }
         }
 
-        /// <summary>
-        /// 计算保持宽高比下最大缩放图片尺寸
-        /// </summary>
-        /// <param name="originSize"></param>
-        /// <param name="targetSize"></param>
-        /// <param name="computerSize"></param>
-        public static void ComputerKeepRatioZoomSize(Size originSize, Size targetSize, out Size computerSize)
-        {
-            try
-            {
-                var maxwidth = targetSize.Width;
-                var maxheight = targetSize.Height;
-                var maxratio = (float)maxwidth / maxheight;
-
-                var width = originSize.Width;
-                var height = originSize.Height;
-                var ratio = (float)width / height;
-
-                //目标大小的宽高比与原图相同
-                if (maxratio == ratio)
-                {
-                    computerSize = targetSize;
-                }
-                else
-                {
-                    var gcd = GCD(width, height);
-
-                    var minwidth = width / gcd;
-                    var minheight = height / gcd;
-
-
-                    var quotientW = maxwidth / minwidth;
-                    var quotientH = maxheight / minheight;
-
-                    var commonQuotient = Math.Min(quotientW, quotientH);
-
-                    var resizeW = minwidth * commonQuotient;
-                    var resizeH = minheight * commonQuotient;
-
-                    computerSize = new Size(resizeW, resizeH);
-                }
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// 公约数
-        /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <returns></returns>
-        public static int GCD(int a, int b)
-        {
-            if (0 != b) while (0 != (a %= b) && 0 != (b %= a)) ;
-            return a + b;
-        }
-
-
         /******************************************Common Method***********************************************/
-        
+
         #region Common Method
         /// <summary>
         /// 保存文件
@@ -906,7 +875,7 @@ namespace ChooseC.Image.WaterMark.Core
         /// <param name="imgname"></param>
         /// <param name="exporttype"></param>
         /// <param name="exportpath"></param>
-        public static void SaveImageFile(Bitmap bitmap, string imgname, ImageFormat exporttype, string exportpath)
+        public static void SaveImageFile(Bitmap bitmap, string imgname, ImageFormat exporttype, string exportpath, long qualityNum = 100L)
         {
             //文件类型
             var imageFormat = exporttype;
@@ -918,7 +887,7 @@ namespace ChooseC.Image.WaterMark.Core
             using FileStream filestream = File.OpenWrite(Path.Combine(exportpath, filename));
 
             EncoderParameters encoderParameters = new EncoderParameters(1);
-            encoderParameters.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 100L);
+            encoderParameters.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, qualityNum);
 
             var encoder = ImageCodecInfo.GetImageEncoders().FirstOrDefault(x => x.FormatID == imageFormat.Guid);
 
@@ -957,7 +926,7 @@ namespace ChooseC.Image.WaterMark.Core
         /// </summary>
         /// <param name="make"></param>
         /// <returns></returns>
-        public static FileInfo GetLogos(string folderpath,string make)
+        public static FileInfo GetLogos(string folderpath, string make)
         {
             try
             {
@@ -1032,11 +1001,109 @@ namespace ChooseC.Image.WaterMark.Core
         public static Color GetColor(string Hex)
         {
             var b = Hex.ToCharArray();
-            var R = Convert.ToInt32(b[0].ToString() + b[1].ToString(),16);
-            var G = Convert.ToInt32(b[2].ToString() + b[3].ToString(),16);
-            var B = Convert.ToInt32(b[4].ToString() + b[5].ToString(),16);
+            var R = Convert.ToInt32(b[0].ToString() + b[1].ToString(), 16);
+            var G = Convert.ToInt32(b[2].ToString() + b[3].ToString(), 16);
+            var B = Convert.ToInt32(b[4].ToString() + b[5].ToString(), 16);
             var A = Convert.ToInt32(b[6].ToString() + b[7].ToString(), 16);//透明度
-            return Color.FromArgb(A,R,G,B);
+            return Color.FromArgb(A, R, G, B);
+        }
+        /// <summary>
+        /// 计算原图保持宽高比前提下，在指定尺寸下最大的缩放大小
+        /// </summary>
+        /// <param name="originSize"></param>
+        /// <param name="targetSize"></param>
+        /// <returns></returns>
+        public static Size ComputerMaxScaleSize(Size originSize, Size targetSize, double keepBlank = 0.05)
+        {
+
+            try
+            {
+                var scaleSize = Size.Empty;
+
+                var width = originSize.Width;
+                var height = originSize.Height;
+                var ratio = (float)width / height;
+                if (targetSize == Size.Empty)
+                {
+                    scaleSize = originSize;
+                }
+                else if (targetSize.Width > 0 && targetSize.Height <= 0)
+                {
+                    scaleSize = new Size()
+                    {
+                        Width = targetSize.Width,
+                        Height = (int)Math.Round(targetSize.Width / ratio, 0)
+                    };
+                }
+                else if (targetSize.Width <= 0 && targetSize.Height > 0)
+                {
+                    scaleSize = new Size()
+                    {
+                        Width = (int)Math.Round(targetSize.Height * ratio, 0),
+                        Height = targetSize.Height
+                    };
+                }
+                else
+                {
+                    var maxwidth = targetSize.Width;
+                    var maxheight = targetSize.Height;
+                    var maxratio = (float)maxwidth / maxheight;
+
+                    //目标大小的宽高比与原图相同
+                    if (maxratio == ratio)
+                    {
+                        scaleSize = targetSize;
+                    }
+                    else
+                    {
+                        var gcd = GCD(width, height);
+
+                        var minwidth = width / gcd;
+                        var minheight = height / gcd;
+
+
+                        var quotientW = maxwidth / minwidth;
+                        var quotientH = maxheight / minheight;
+
+                        var commonQuotient = Math.Min(quotientW, quotientH);
+
+                        var resizeW = minwidth * commonQuotient;
+                        var resizeH = minheight * commonQuotient;
+
+                        //避免只有宽或高有留白,保留一定比例像素的留白
+                        if (resizeH == maxheight && resizeW < maxwidth)
+                        {
+                            resizeH = resizeH - (int)Math.Round(resizeH * keepBlank, 0);
+                            resizeW = (int)Math.Round(resizeH * ratio, 0);
+                        }
+                        else if (resizeH < maxheight && resizeW == maxwidth)
+                        {
+                            resizeW = resizeW - (int)Math.Round(resizeW * keepBlank, 0);
+                            resizeH = (int)Math.Round(resizeW / ratio, 0);
+                        }
+
+                        scaleSize = new Size(resizeW, resizeH);
+                    }
+                }
+                return scaleSize;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+
+        /// <summary>
+        /// 公约数
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static int GCD(int a, int b)
+        {
+            if (0 != b) while (0 != (a %= b) && 0 != (b %= a)) ;
+            return a + b;
         }
         #endregion
 

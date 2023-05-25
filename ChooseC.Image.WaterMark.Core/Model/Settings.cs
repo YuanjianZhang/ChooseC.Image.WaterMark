@@ -5,6 +5,7 @@ namespace ChooseC.Image.WaterMark.Core.Model
 {
     public sealed class Settings
     {
+        private long _exportquality = 100L;
         /// <summary>
         /// 导出文件类型
         /// </summary>
@@ -12,7 +13,18 @@ namespace ChooseC.Image.WaterMark.Core.Model
         /// <summary>
         /// 导出质量
         /// </summary>
-        public int exportquality { get; set; }
+        public long exportquality
+        {
+            get
+            {
+                if (_exportquality > 100L) return 100L;
+                return _exportquality;
+            }
+            set
+            {
+                _exportquality = value;
+            }
+        }
         /// <summary>
         /// 导出文件夹
         /// </summary>
@@ -55,6 +67,10 @@ namespace ChooseC.Image.WaterMark.Core.Model
         public ConfigSection bottom { get; set; }
         public ConfigSection surround { get; set; }
         public ConfigSection onlyfill { get; set; }
+        /// <summary>
+        /// 底部信息和图像的间隔
+        /// </summary>
+        public int bottommargin { get; set; }
 
     }
 

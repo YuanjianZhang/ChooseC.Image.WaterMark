@@ -53,7 +53,5 @@
         /// 镜头型号
         /// </summary>
         public static readonly int lensmodel = 0xA434;
-
-        public Dictionary<string, string> tags = new Dictionary<string, string>();
     }
 }

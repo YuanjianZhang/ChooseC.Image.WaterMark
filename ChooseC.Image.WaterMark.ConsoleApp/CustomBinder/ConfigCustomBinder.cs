@@ -11,8 +11,13 @@ namespace ChooseC.Image.WaterMark.ConsoleApp.CustomBinder
         IConfigurationRoot GetRoot(BindingContext bindingContext)
         {
             var root = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.develop.json", true, true)
-                .AddJsonFile("appsettings.json", false, true).Build();
+                .AddJsonFile(
+                Environment.GetEnvironmentVariable("ENV") is null ?
+                "appsettings.json"
+                :
+                $"appsettings{"." + Environment.GetEnvironmentVariable("ENV")}.json", true, true)
+                .AddJsonFile("appsettings.json", false, true)
+                .Build();
             return root;
         }
     }
