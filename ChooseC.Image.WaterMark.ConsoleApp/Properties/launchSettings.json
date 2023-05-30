@@ -2,7 +2,10 @@
   "profiles": {
     "ChooseC.Image.WaterMark.ConsoleApp": {
       "commandName": "Project",
-      "commandLineArgs": "R --path \"G:\\Nikon Z30 LR\\九溪\" --layout topbottom"
+      "commandLineArgs": "R --path \"G:\\Nikon Z30 LR\\九溪\\DSC_0041-2.jpg\" --layout topbottom",
+      "environmentVariables": {
+        "INFOPIC": "1"
+      }
     }
   }
 }

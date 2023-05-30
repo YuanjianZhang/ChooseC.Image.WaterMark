@@ -53,5 +53,9 @@
         /// 镜头型号
         /// </summary>
         public static readonly int lensmodel = 0xA434;
+        /// <summary>
+        /// 镜头规格
+        /// </summary>
+        public static readonly int lensspec = 0xA432;
     }
 }

@@ -53,6 +53,9 @@ namespace ChooseC.Image.WaterMark.Core
                         case nameof(InfoTag.lensmodel):
                             dict.Add(tag, GetDescription_SubIFD(directories, InfoTag.lensmodel));
                             break;
+                        case nameof(InfoTag.lensspec):
+                            dict.Add(tag, GetDescription_SubIFD(directories, InfoTag.lensspec));
+                            break;
                         default:
                             dict.Add(tag, string.Empty);
                             break;

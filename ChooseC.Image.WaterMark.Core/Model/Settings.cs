@@ -58,6 +58,10 @@ namespace ChooseC.Image.WaterMark.Core.Model
         /// </remarks>
         public Size exportsize { get; set; }
         /// <summary>
+        /// 分割线颜色
+        /// </summary>
+        public string splitlinecolor { get; set; }
+        /// <summary>
         /// 个签
         /// </summary>
         public string sign { get; set; }
@@ -105,7 +109,9 @@ namespace ChooseC.Image.WaterMark.Core.Model
         /// </summary>
         public string fillcolor { get; set; }
         /// <summary>
-        /// 背景填充空白占比率
+        /// 背景填充空白占比 
+        /// 小于1为相对原图百分比占比
+        /// 大于1为占比像素值
         /// </summary>
         public double fillratio { get; set; }
         /// <summary>
@@ -126,7 +132,18 @@ namespace ChooseC.Image.WaterMark.Core.Model
         /// <item> number>1：Logo图像最大像素高度</item>
         /// </list>
         /// </remarks>
-        public double logmaxheight { get; set; } = 0;
+        public double logmaxheight { get; set; }
+
+        /// <summary>
+        /// 底部信息最大尺寸
+        /// </summary>
+        /// <remarks>
+        /// <list type="bullet">
+        /// <item> 1>=number>0：相对原图的占比</item>
+        /// <item> number>1：底部信息最大像素高度</item>
+        /// </list>
+        /// </remarks>
+        public Size bottommaxsize { get; set; } 
 
     }
 

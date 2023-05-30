@@ -15,6 +15,7 @@ namespace ChooseC.Image.WaterMark.Core
         public static readonly string SourceFolder = Path.Combine(AppContext.BaseDirectory, "Source");
         public static readonly string FontsFolder = Path.Combine(SourceFolder, "Fonts");
         public static readonly string LogosFolder = Path.Combine(SourceFolder, "Logos");
+
         /// <summary>
         /// 创建水印图片在底部，布局为上下
         /// </summary>
@@ -58,6 +59,8 @@ namespace ChooseC.Image.WaterMark.Core
                                 logoFont,
                                 GetColor(config.fillcolor),
                                 GetColor(config.wordlogofont.fontcolor),
+                                GetColor(settings.splitlinecolor),
+                                Size.Empty,
                                 10,
                                 10,
                                 false);
@@ -68,6 +71,15 @@ namespace ChooseC.Image.WaterMark.Core
                             break;
                     }
                     #endregion
+
+                    #region origin Bitmap 
+                    var originBitmap = FillImage(
+                        stream,
+                        GetColor(config.fillcolor),
+                        settings.exportsize,
+                        0);
+                    #endregion
+
                     #region get bottom info
                     //font
                     var font = GetFont(
@@ -84,16 +96,13 @@ namespace ChooseC.Image.WaterMark.Core
                         font,
                         GetColor(config.fillcolor),
                         GetColor(config.infofont.fontcolor),
+                                GetColor(settings.splitlinecolor),
+                        new Size(originBitmap.Width, 0),
                         10,
                         10,
                         false);
                     #endregion
-                    // origin bitmap 
-                    var originBitmap = FillImage(
-                        stream,
-                        GetColor(config.fillcolor),
-                        settings.exportsize,
-                        0);
+
                     #region 计算绘制的图片大小
 
                     if (config.logmaxheight > 0)
@@ -111,8 +120,8 @@ namespace ChooseC.Image.WaterMark.Core
                             topBitmap = new Bitmap(topBitmap, resize);
                         }
                     }
-                    var totalHeight = originBitmap.Height 
-                        + (topBitmap == null ? 0 : topBitmap.Height) 
+                    var totalHeight = originBitmap.Height
+                        + (topBitmap == null ? 0 : topBitmap.Height)
                         + (bottomBitmap == null ? 0 : bottomBitmap.Height)
                         + settings.bottommargin;
                     var totalWidth = Math.Max(
@@ -140,14 +149,14 @@ namespace ChooseC.Image.WaterMark.Core
                     if (topBitmap is not null)
                     {
                         x = (originBitmap.Width - topBitmap.Width) / 2;
-                        y = originBitmap.Height 
+                        y = originBitmap.Height
                             + settings.bottommargin;
                         graphics.DrawImage(topBitmap, x, y, topBitmap.Width, topBitmap.Height);
                     }
                     if (bottomBitmap is not null)
                     {
                         x = (originBitmap.Width - bottomBitmap.Width) / 2;
-                        y = originBitmap.Height 
+                        y = originBitmap.Height
                             + (topBitmap == null ? 0 : topBitmap.Height)
                             + settings.bottommargin;
                         graphics.DrawImage(bottomBitmap, x, y, bottomBitmap.Width, bottomBitmap.Height);
@@ -227,6 +236,8 @@ namespace ChooseC.Image.WaterMark.Core
                                 logoFont,
                                 GetColor(config.fillcolor),
                                 GetColor(config.wordlogofont.fontcolor),
+                                GetColor(settings.splitlinecolor),
+                                Size.Empty,
                                 10,
                                 10,
                                 false);
@@ -253,6 +264,8 @@ namespace ChooseC.Image.WaterMark.Core
                                 logoFont,
                                 GetColor(config.fillcolor),
                                 GetColor(config.infofont.fontcolor),
+                                GetColor(settings.splitlinecolor),
+                                Size.Empty,
                                 10,
                                 10,
                                 false);
@@ -264,6 +277,7 @@ namespace ChooseC.Image.WaterMark.Core
                     }
                     #endregion
 
+                    #region    get left  info || get right info
                     //font
                     var font = GetFont(
                         config.infofont.fontname,
@@ -273,26 +287,32 @@ namespace ChooseC.Image.WaterMark.Core
                     //info
                     var leftinfo = FormatterInfo(config.leftinfo, infoDict);
                     var rightinfo = FormatterInfo(config.rightinfo, infoDict);
-                    //get left  info
+
+
                     leftinfoBitmap = WaterMarkHelper.CreateWordImage(
                         leftinfo,
                         sf,
                         font,
                         GetColor(config.fillcolor),
                         GetColor(config.infofont.fontcolor),
+                                GetColor(settings.splitlinecolor),
+                        new Size(0, config.bottommaxsize.Height),
                         10,
                         10,
                         leftBitmap != null);
-                    //get right info
+
                     rightinfoBitmap = WaterMarkHelper.CreateWordImage(
                         rightinfo,
                         sf,
                         font,
                         GetColor(config.fillcolor),
                         GetColor(config.infofont.fontcolor),
+                                GetColor(settings.splitlinecolor),
+                        new Size(0, config.bottommaxsize.Height),
                         10,
                         10,
                         rightBitmap != null);
+                    #endregion
 
                     #region origin bitmap 
                     var originBitmap = Bitmap.FromStream(stream);
@@ -306,6 +326,8 @@ namespace ChooseC.Image.WaterMark.Core
                             (int)Math.Round(originBitmap.Height * config.logmaxheight, 0)
                             :
                             (int)config.logmaxheight;
+                        maxheight = maxheight > config.bottommaxsize.Height ? config.bottommaxsize.Height : maxheight;
+
                         if (leftBitmap != null && leftBitmap.Height > maxheight)
                         {
                             var logoRatio = (double)leftBitmap.Width / leftBitmap.Height;
@@ -457,6 +479,8 @@ namespace ChooseC.Image.WaterMark.Core
                                 logoFont,
                                 GetColor(config.fillcolor),
                                 GetColor(config.wordlogofont.fontcolor),
+                                GetColor(settings.splitlinecolor),
+                                Size.Empty,
                                 10,
                                 10,
                                 false);
@@ -483,6 +507,8 @@ namespace ChooseC.Image.WaterMark.Core
                                 logoFont,
                                 GetColor(config.fillcolor),
                                 GetColor(config.wordlogofont.fontcolor),
+                                GetColor(settings.splitlinecolor),
+                                Size.Empty,
                                 10,
                                 10,
                                 false);
@@ -493,6 +519,8 @@ namespace ChooseC.Image.WaterMark.Core
                             break;
                     }
                     #endregion
+
+                    #region get left  info || get right info
 
                     //font
                     var font = GetFont(
@@ -517,6 +545,8 @@ namespace ChooseC.Image.WaterMark.Core
                         font,
                         GetColor(config.fillcolor),
                         GetColor(config.infofont.fontcolor),
+                                GetColor(settings.splitlinecolor),
+                        new Size(0, config.bottommaxsize.Height),
                         10,
                         10,
                         leftBitmap != null);
@@ -527,9 +557,13 @@ namespace ChooseC.Image.WaterMark.Core
                         font,
                         GetColor(config.fillcolor),
                         GetColor(config.infofont.fontcolor),
+                                GetColor(settings.splitlinecolor),
+                        new Size(0, config.bottommaxsize.Height),
                         10,
                         10,
                         rightBitmap != null);
+
+                    #endregion
 
                     #region origin bitmap 
                     var originBitmap = Bitmap.FromStream(stream);
@@ -543,6 +577,8 @@ namespace ChooseC.Image.WaterMark.Core
                             (int)Math.Round(originBitmap.Height * config.logmaxheight, 0)
                             :
                             (int)config.logmaxheight;
+                        maxheight = maxheight > config.bottommaxsize.Height ? config.bottommaxsize.Height : maxheight;
+
                         if (leftBitmap != null && leftBitmap.Height > maxheight)
                         {
                             var logoRatio = (double)leftBitmap.Width / leftBitmap.Height;
@@ -562,12 +598,15 @@ namespace ChooseC.Image.WaterMark.Core
                         }
                     }
                     #endregion
+                    int maxBottomHeight = 0;
 
                     var maxInfoHeigt = Math.Max(
                             Math.Max(leftBitmap == null ? 0 : leftBitmap.Height, leftinfoBitmap == null ? 0 : leftinfoBitmap.Height),
                             Math.Max(rightBitmap == null ? 0 : rightBitmap.Height, rightinfoBitmap == null ? 0 : rightinfoBitmap.Height)
                             );
-                    var totalHeight = originBitmap.Height + maxInfoHeigt;
+                    var totalHeight = originBitmap.Height
+                        + maxInfoHeigt
+                        + maxBottomHeight;
                     var totalWidth = originBitmap.Width;
                     Bitmap exportBitmap = new Bitmap(totalWidth, totalHeight);
 
@@ -586,11 +625,20 @@ namespace ChooseC.Image.WaterMark.Core
                     //背景设置白色
                     graphics.Clear(GetColor(config.fillcolor));
                     #endregion
-                    var fillratio = config.fillratio;
-                    var x = (int)Math.Round(originBitmap.Width * fillratio / 2, 0);
-                    var y = (int)Math.Round(originBitmap.Height * fillratio / 2, 0);
 
-                    graphics.DrawImage(originBitmap, x, y, originBitmap.Width - (x * 2), originBitmap.Height - (y * 2));
+                    int x = 0, y = 0;
+                    if (config.fillratio > 0 && config.fillratio <= 1)
+                    {
+                        x = (int)Math.Round(originBitmap.Width * config.fillratio / 2, 0);
+                        y = (int)Math.Round(originBitmap.Height * config.fillratio / 2, 0);
+                    }
+                    else
+                    {
+                        x = (int)config.fillratio;
+                        y = (int)config.fillratio;
+                    }
+
+                    graphics.DrawImage(originBitmap, x, y, originBitmap.Width, originBitmap.Height);
                     if (leftBitmap is not null)
                     {
                         x = 0;
@@ -701,48 +749,99 @@ namespace ChooseC.Image.WaterMark.Core
         /// <param name="topPadding">上下间距</param>
         /// <param name="splitLineFlag">是否分割线</param>
         /// <returns></returns>
-        public static Bitmap CreateWordImage(string word, StringFormat sf, Font font, Color fillcolor, Color pencolor, int leftPadding = 10, int topPadding = 10, bool splitLineFlag = false)
+        public static Bitmap CreateWordImage(string word, StringFormat sf, Font font, Color fillcolor, Color pencolor, Color splitLineColor, Size size, int leftPadding = 10, int topPadding = 10, bool splitLineFlag = false)
         {
             try
             {
-                //计算估测的图片高度和宽度
-                var drawInfoSize = ComputerDrawStringSize(word, font, sf, new SizeF(9000F, 9000F), out int chartNum, out int lineNum);
-                //计算图片总大小
+                //默认宽度不设限
+                var maxWidth = 9000;
+                if (size != Size.Empty)
+                {
+                    //优先宽度
+                    maxWidth = size.Width;
+                    if (size.Width > 0 && size.Height <= 0) maxWidth = size.Width;
+                    if (size.Width <= 0 && size.Height > 0) maxWidth = size.Height;
+                }
+
+                if (sf is null) sf = StringFormat.GenericTypographic;
+
+                //计算估测的图片高度和宽度【不换行】
+                //var drawInfoSize = ComputerDrawStringSize(word, font, sf, new SizeF(9000F,9000F), out int chartNum, out int lineNum);
+                //固定宽度，计算估测的图片高度【换行】
+                var drawInfoSize = ComputerDrawStringSize(word, font, maxWidth, sf);
+                //图片总宽：绘制的宽度 + 左右间隔宽度
                 var totalWidth = (int)Math.Round(
                 drawInfoSize.Width + (2 * leftPadding)
                 , 0);
+                //图片总高：绘制的高度 + 上下间隔高度
                 var totalHeight = (int)Math.Round(
                     drawInfoSize.Height + (2 * topPadding)
                     , 0);
-                //创建绘制图像
+
+                //创建绘制的矩形
+                //在矩形中绘制，会自动换行
+                var drawRectangle = new RectangleF()
+                {
+                    //尺寸
+                    Size = new Size(totalWidth, totalHeight),
+                    //绘制开始点
+                    Location = new PointF(leftPadding, topPadding),
+                };
+
+                //创建位图对象
                 Bitmap bitmap = new Bitmap(totalWidth, totalHeight);
+                //创建图形对象
                 using Graphics graphics = Graphics.FromImage(bitmap);
-                //图像字体质量
+                #region 绘制图形质量配置
+                //字体质量
                 graphics.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
                 graphics.TextContrast = 4;//高对比度,default : 4 
-
-                //图像质量
+                //图形质量
                 graphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
                 graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
                 graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
                 graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                //计算绘制开始点
-                float x = leftPadding;
-                float y = topPadding;
-                //背景设置白色
+
+                #endregion
+                #region 绘制方向 通过旋转图片绘制垂直方向的文字，ref:https://stackoverflow.com/questions/8970807
+                if (sf.FormatFlags.HasFlag(StringFormatFlags.DirectionVertical))
+                {
+                    //结合旋转，可以实现从下到上书写，左对齐。
+                    //sf.FormatFlags = StringFormatFlags.DirectionVertical|StringFormatFlags.DirectionRightToLeft;
+                    //设置绘制点为右下角
+                    //graphics.TranslateTransform(drawRectangle.Right, drawRectangle.Bottom);
+                    //旋转180
+                    //graphics.RotateTransform(180);
+                }
+                else
+                {
+                    //水平绘制，左对齐
+                }
+                #endregion
+                //背景设置填充色
                 graphics.Clear(fillcolor);
                 //绘制画笔颜色
-                SolidBrush pen = new SolidBrush(pencolor);
-                graphics.DrawString(word, font, pen, x, y, sf);
-                //分割线
+                using SolidBrush pen = new SolidBrush(pencolor);
+
+                //绘制文字
+                graphics.DrawString(word, font, pen, drawRectangle, sf);
+                //绘制分割线
                 if (splitLineFlag)
                 {
-                    graphics.DrawLine(new Pen(Color.FromArgb(228, 228, 228)), 0, topPadding, 0, topPadding + (int)drawInfoSize.Height);
+                    graphics.DrawLine(
+                        new Pen(splitLineColor),
+                        0,
+                        topPadding,
+                        0,
+                        drawRectangle.Size.Height - topPadding);
                 }
+
                 graphics.Flush();
 
-                //SaveImageFile(bitmap, "info", ImageFormat.Jpeg, Path.Combine(AppContext.BaseDirectory,"infoExport"));
-
+                if (Environment.GetEnvironmentVariable("INFOPIC") is not null)
+                {
+                    SaveImageFile(bitmap, "info", ImageFormat.Jpeg, Path.Combine(AppContext.BaseDirectory, "infoExport"));
+                }
                 return bitmap;
             }
             catch (Exception ex)
@@ -751,7 +850,7 @@ namespace ChooseC.Image.WaterMark.Core
             }
         }
         /// <summary>
-        /// 计算绘制文字的图片高度和宽度
+        /// 计算绘制文字的图片高度和宽度【不换行】
         /// </summary>
         /// <param name="strContent"></param>
         /// <param name="font"></param>
@@ -768,6 +867,21 @@ namespace ChooseC.Image.WaterMark.Core
             //var TextRenderdrawStringSize =TextRenderer.MeasureText(strContent, font);
             //drawStringSize.Width = TextRenderdrawStringSize.Width;
             //drawStringSize.Height = TextRenderdrawStringSize.Height;
+            return drawStringSize;
+        }
+        /// <summary>
+        /// 指定最大宽度，计算绘制文字图像高度
+        /// </summary>
+        /// <param name="strContent"></param>
+        /// <param name="font"></param>
+        /// <param name="maxWidth"></param>
+        /// <param name="stringFormat"></param>
+        /// <returns></returns>
+        public static SizeF ComputerDrawStringSize(string strContent, Font font, int maxWidth, StringFormat stringFormat = null)
+        {
+            using Graphics graphics = Graphics.FromImage(new Bitmap(maxWidth, 9000));
+            var drawStringSize = graphics.MeasureString(strContent, font, maxWidth, stringFormat ?? StringFormat.GenericDefault);
+
             return drawStringSize;
         }
 
@@ -798,8 +912,19 @@ namespace ChooseC.Image.WaterMark.Core
                     graphics.Clear(fillcolor);
 
                     //计算坐标 (默认原图缩放10%的空间为空白填充)
-                    var x = (int)Math.Ceiling(targetSize.Width * fillratio / 2);
-                    var y = (int)Math.Ceiling(targetSize.Height * fillratio / 2);
+                    var x = 0;
+                    var y = 0;
+                    if (fillratio > 0 && fillratio <= 1)
+                    {
+                        x = (int)Math.Ceiling(targetSize.Width * fillratio / 2);
+                        y = (int)Math.Ceiling(targetSize.Height * fillratio / 2);
+                    }
+                    else
+                    {
+                        x = (int)fillratio;
+                        y = (int)fillratio;
+                    }
+
                     graphics.DrawImage(image,
                                        x,
                                        y,
@@ -836,7 +961,7 @@ namespace ChooseC.Image.WaterMark.Core
                     graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
                     graphics.SmoothingMode = SmoothingMode.HighQuality;
                     graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                    //背景设置白色
+                    //背景设置
                     graphics.Clear(fillcolor);
 
                     //计算绘制的图像大小
@@ -858,7 +983,7 @@ namespace ChooseC.Image.WaterMark.Core
                 }
 
             }
-            catch (Exception)
+            catch
             {
 
                 throw;
@@ -1062,8 +1187,8 @@ namespace ChooseC.Image.WaterMark.Core
                         var minheight = height / gcd;
 
 
-                        var quotientW = maxwidth / minwidth;
-                        var quotientH = maxheight / minheight;
+                        var quotientW = (double)maxwidth / minwidth;
+                        var quotientH = (double)maxheight / minheight;
 
                         var commonQuotient = Math.Min(quotientW, quotientH);
 
@@ -1082,7 +1207,7 @@ namespace ChooseC.Image.WaterMark.Core
                             resizeH = (int)Math.Round(resizeW / ratio, 0);
                         }
 
-                        scaleSize = new Size(resizeW, resizeH);
+                        scaleSize = new Size((int)resizeW, (int)resizeH);
                     }
                 }
                 return scaleSize;
