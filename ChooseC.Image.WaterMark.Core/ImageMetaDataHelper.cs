@@ -1,16 +1,18 @@
 ﻿using ChooseC.Image.WaterMark.Core.Model;
 using MetadataExtractor.Formats.Exif;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace ChooseC.Image.WaterMark.Core
 {
     public class ImageMetaDataHelper
     {
-        public static IReadOnlyDictionary<string, string> GetMetaData(string path, params string[] tags)
+        public static IReadOnlyDictionary<string, string> GetMetaData(string path, KeyValuePair<string, string>[] appendDict = null, params string[] tags)
         {
             using var filestream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
-            return GetMetaData(filestream, tags);
+            return GetMetaData(filestream, appendDict, tags);
         }
-        public static IReadOnlyDictionary<string, string> GetMetaData(Stream stream, params string[] tags)
+        public static IReadOnlyDictionary<string, string> GetMetaData(Stream stream, KeyValuePair<string, string>[] appendDict = null, params string[] tags)
         {
             try
             {
@@ -21,7 +23,9 @@ namespace ChooseC.Image.WaterMark.Core
                     switch (tag)
                     {
                         case nameof(InfoTag.camermake):
-                            dict.Add(tag, GetDescription_IFD0(directories, InfoTag.camermake));
+                            dict.Add(tag, RemoveIllegal(
+                                GetDescription_IFD0(directories, InfoTag.camermake)
+                                ));
                             break;
                         case nameof(InfoTag.camermodel):
                             dict.Add(tag, GetDescription_IFD0(directories, InfoTag.camermodel));
@@ -61,6 +65,23 @@ namespace ChooseC.Image.WaterMark.Core
                             break;
                     }
                 }
+
+                #region append Dict
+                if (appendDict is not null && appendDict.Length > 0)
+                {
+                    foreach (var apdict in appendDict)
+                    {
+                        if (dict.ContainsKey(apdict.Key))
+                        {
+                            dict[apdict.Key] = apdict.Value;
+                        }
+                        else
+                        {
+                            dict.Add(apdict.Key, apdict.Value);
+                        }
+                    }
+                }
+                #endregion
                 return dict;
             }
             catch (Exception)
@@ -136,6 +157,11 @@ namespace ChooseC.Image.WaterMark.Core
         {
             var IfdDirectory = list.OfType<ExifIfd0Directory>().FirstOrDefault();
             return IfdDirectory?.GetDescription(ID);
+        }
+        private static readonly string illegalReg = @"(CORPORATION)";
+        protected static string RemoveIllegal(string input)
+        {
+            return Regex.Replace(input, illegalReg, string.Empty);
         }
     }
 }

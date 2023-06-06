@@ -83,7 +83,7 @@ namespace ChooseC.Image.WaterMark.Core
         /// <param name="fontStyle"></param>
         /// <param name="graphicsUnit"></param>
         /// <returns><see cref="Font"/></returns>
-        public static Font GetFont(string path, int fontSize = 18, FontStyle fontStyle = FontStyle.Regular, GraphicsUnit graphicsUnit = GraphicsUnit.Pixel)
+        public static Font GetFontByPath(string path, int fontSize = 18, FontStyle fontStyle = FontStyle.Regular, GraphicsUnit graphicsUnit = GraphicsUnit.Pixel)
         {
             try
             {
@@ -104,6 +104,23 @@ namespace ChooseC.Image.WaterMark.Core
                 return new Font(new InstalledFontCollection().Families.First(), fontSize, fontStyle, graphicsUnit, 0);
             }
         }
+        /// <summary>
+        /// 获取本地安装字体
+        /// </summary>
+        /// <param name="familyName">字体名称</param>
+        /// <returns></returns>
+        public static Font GetFont(string familyName,int fontSize = 18, FontStyle fontStyle = FontStyle.Regular, GraphicsUnit graphicsUnit = GraphicsUnit.Pixel)
+        {
+            if (CheckFont(familyName))
+            {
+                return new Font(familyName, fontSize, fontStyle, graphicsUnit);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
 
         /// <summary>
         /// 检查字体是否存在
@@ -112,9 +129,10 @@ namespace ChooseC.Image.WaterMark.Core
         /// <returns></returns>
         public static bool CheckFont(string familyName)
         {
-            string FontPath = Path.Combine(System.Environment.GetEnvironmentVariable("WINDIR"), "fonts", Path.GetFileName(familyName));
-            //检测系统是否已安装该字体
-            return File.Exists(FontPath);
+            using (var ifc = new InstalledFontCollection())
+            {
+                return ifc.Families.FirstOrDefault(p=>p.Name.ToLower() == familyName.ToLower()) != default(FontFamily);
+            }
         }
 
         /// <summary>
@@ -129,7 +147,7 @@ namespace ChooseC.Image.WaterMark.Core
             FontFamily[] fontFamilies = installedFontCollection.Families;
             foreach (var item in fontFamilies)
             {
-                if (item.Name.Equals(familyName))
+                if (item.Name.ToLower().Equals(familyName.ToLower()))
                 {
                     return item.IsStyleAvailable(fontStyle);
                 }

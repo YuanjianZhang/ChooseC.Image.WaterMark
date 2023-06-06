@@ -13,6 +13,21 @@
 控制台：ChooseC.Image.WaterMark.ConsoleApp
 ```
 
+### 运行实例
+
+```batch
+@REM 上下布局
+WaterMark.exe R --path "demo\demo.jpg" --layout topbottom
+@REM 底部布局
+WaterMark.exe R --path "demo\demo.jpg" --layout bottom
+@REM 底部环绕布局
+WaterMark.exe R --path "demo\demo.jpg" --layout surround
+@REM 只填充
+WaterMark.exe R --path "demo\demo.jpg" --layout onlyfill
+```
+
+### 常见问题
+
 ### 功能
 
 ----
@@ -95,15 +110,14 @@
 
 尺寸为实际输出图片中除去水印相框的尺寸【OnlyFill为实际输出图片尺寸，其它为图像内容尺寸】
 
-> + exportsize
->   + width
->   + height
+>`(width > 0 && height == 0 ) || (width == 0 && height >0)`：根据原图的宽高比计算缩放后的图片，与导出尺寸有相差的部份，使用fillcolor填充。【处理后的图像，尺寸只能确保宽或高为指定值。】
+>`(width == 0&&height == 0)`：不缩放图片
+>`(width > 0 && height > 0)`：根据导出尺寸，在保持原图宽高比的前提下，计算原图的最大缩放比例，与导出尺寸有相差的部份，使用fillcolor填充。【处理后的图像，尺寸与配置相同】
 >
->**width、height都为0，原尺寸输出，不进行缩放**
->
->**只有width 或 heiht,根据原图宽高比进行缩放**
->
->[System.Drawing.Size](https://learn.microsoft.com/en-us/dotnet/api/system.drawing.size)
+> > + exportsize
+> > + width
+> > + height
+> >[System.Drawing.Size](https://learn.microsoft.com/en-us/dotnet/api/system.drawing.size)
 
 #### sign
 

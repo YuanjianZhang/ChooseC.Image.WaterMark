@@ -67,23 +67,25 @@ namespace ChooseC.Image.WaterMark.ConsoleApp
                         result.ErrorMessage = "无效文件/文件夹路径！";
                         return null;
                     }
+                    #region 绝对路径
                     string? filePath = result.Tokens.Single().Value;
-                    if (!Directory.Exists(filePath))
-                    {
-                        if (!File.Exists(filePath))
-                        {
-                            result.ErrorMessage = "无效文件/文件夹路径！";
-                            return null;
-                        }
-                        else
-                        {
-                            return new DirectoryInfo(filePath);
-                        }
-                    }
-                    else
-                    {
+                    if (Directory.Exists(filePath))
                         return new DirectoryInfo(filePath);
-                    }
+                    else
+                        if (File.Exists(filePath)) return new DirectoryInfo(filePath);
+
+                    #endregion
+
+                    #region 相对路径
+                    var relativefilePath = Path.Combine(AppContext.BaseDirectory, filePath);
+                    if (Directory.Exists(relativefilePath))
+                        return new DirectoryInfo(relativefilePath);
+                    else
+                        if (File.Exists(relativefilePath)) return new DirectoryInfo(relativefilePath);
+                    #endregion
+
+                    result.ErrorMessage = "无效文件/文件夹路径！";
+                    return null;
                 }
                 );
             #endregion
@@ -242,7 +244,7 @@ namespace ChooseC.Image.WaterMark.ConsoleApp
                                 foreach (var ls in list)
                                 {
                                     await Process(ls.FullName, exportfolder, layout, direction, size, logger, config);
-                                
+
                                 }
                             }
                             break;
@@ -289,16 +291,16 @@ namespace ChooseC.Image.WaterMark.ConsoleApp
                 switch (layout)
                 {
                     case LayoutEnum.topbottom:
-                        WaterMarkHelper.CreateWaterMark_TopBottom(fileinfo, settings, direction, exportfolder);
+                        await WaterMarkHelper.CreateWaterMark_TopBottom(fileinfo, settings, direction, exportfolder);
                         break;
                     case LayoutEnum.bottom:
-                        WaterMarkHelper.CreateWaterMark_Bottom(fileinfo, settings, direction, exportfolder);
+                        await WaterMarkHelper.CreateWaterMark_Bottom(fileinfo, settings, direction, exportfolder);
                         break;
                     case LayoutEnum.surround:
-                        WaterMarkHelper.CreateWaterMark_Surround(fileinfo, settings, direction, exportfolder);
+                        await WaterMarkHelper.CreateWaterMark_Bottom(fileinfo, settings, direction, exportfolder);
                         break;
                     case LayoutEnum.onlyfill:
-                        WaterMarkHelper.CreateWaterMark_OnlyFill(fileinfo, settings, direction, exportfolder, exportSize);
+                        await WaterMarkHelper.CreateWaterMark_OnlyFill(fileinfo, settings, direction, exportfolder, exportSize);
                         break;
                     default:
                         break;

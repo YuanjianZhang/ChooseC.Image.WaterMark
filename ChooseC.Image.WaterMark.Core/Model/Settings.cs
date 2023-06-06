@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Drawing;
 using System.Drawing.Imaging;
 
 namespace ChooseC.Image.WaterMark.Core.Model
@@ -62,20 +63,26 @@ namespace ChooseC.Image.WaterMark.Core.Model
         /// </summary>
         public string splitlinecolor { get; set; }
         /// <summary>
+        /// 分隔间距
+        /// </summary>
+        public int splitpadding { get; set; }
+        /// <summary>
         /// 个签
         /// </summary>
         public string sign { get; set; }
 
+        private readonly string defaultEmojiFont = "Segoe UI Emoji";
+        private string _emojifont = "";
+        /// <summary>
+        /// emoji 字体名称
+        /// </summary>
+        public string emojifont { get { if (string.IsNullOrWhiteSpace(_emojifont)){ _emojifont = defaultEmojiFont; } return _emojifont; } set { _emojifont = value; } }
+        public double lineheight { get; set; }
         public ConfigSection topbottom { get; set; }
 
         public ConfigSection bottom { get; set; }
         public ConfigSection surround { get; set; }
         public ConfigSection onlyfill { get; set; }
-        /// <summary>
-        /// 底部信息和图像的间隔
-        /// </summary>
-        public int bottommargin { get; set; }
-
     }
 
     public class ConfigSection
@@ -143,8 +150,16 @@ namespace ChooseC.Image.WaterMark.Core.Model
         /// <item> number>1：底部信息最大像素高度</item>
         /// </list>
         /// </remarks>
-        public Size bottommaxsize { get; set; } 
+        public Size bottommaxsize { get; set; }
 
+        /// <summary>
+        /// 底部模块上下间隔像素
+        /// </summary>
+        public int bottommargin { get; set; }
+        /// <summary>
+        /// 底部占比配置
+        /// </summary>
+        public ModelRation bottomratio { get; set; }
     }
 
     public class FontConfig
@@ -169,5 +184,26 @@ namespace ChooseC.Image.WaterMark.Core.Model
         /// 字体单位
         /// </summary>
         public GraphicsUnit fontunit { get; set; }
+    }
+
+    public class ModelRation
+    {
+        /// <summary>
+        /// 左
+        /// </summary>
+        public Model left { get; set; }
+        /// <summary>
+        /// 右
+        /// </summary>
+        public Model right { get; set; }
+    }
+    public class Model
+    {
+        double _value = 0;
+        public double value { get { return _value; } set { if (value > 1) _value = 1; else _value = value; } }
+        /// <summary>
+        /// 从左到右绘制图像的占比
+        /// </summary>
+        public double[] sub { get; set; }
     }
 }

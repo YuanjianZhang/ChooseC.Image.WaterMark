@@ -5,7 +5,9 @@ VisualStudioVersion = 17.5.33627.172
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChooseC.Image.WaterMark.Core", "ChooseC.Image.WaterMark.Core\ChooseC.Image.WaterMark.Core.csproj", "{8E043046-1780-4EA2-BD1E-5290626DE643}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChooseC.Image.WaterMark.ConsoleApp", "ChooseC.Image.WaterMark.ConsoleApp\ChooseC.Image.WaterMark.ConsoleApp.csproj", "{200E6D85-9716-4F43-9DDE-578949E44A16}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChooseC.Image.WaterMark.ConsoleApp", "ChooseC.Image.WaterMark.ConsoleApp\ChooseC.Image.WaterMark.ConsoleApp.csproj", "{200E6D85-9716-4F43-9DDE-578949E44A16}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChooseC.Image.WaterMark.Core.SDX", "ChooseC.Image.WaterMark.Core.SDX\ChooseC.Image.WaterMark.Core.SDX.csproj", "{D9F3897F-1913-43DA-AE3B-1C76963AB17B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{200E6D85-9716-4F43-9DDE-578949E44A16}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{200E6D85-9716-4F43-9DDE-578949E44A16}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{200E6D85-9716-4F43-9DDE-578949E44A16}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D9F3897F-1913-43DA-AE3B-1C76963AB17B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9F3897F-1913-43DA-AE3B-1C76963AB17B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9F3897F-1913-43DA-AE3B-1C76963AB17B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9F3897F-1913-43DA-AE3B-1C76963AB17B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
