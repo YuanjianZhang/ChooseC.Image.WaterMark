@@ -8,6 +8,27 @@
 >功能代码：ChooseC.Image.WaterMark.Core  
 控制台：ChooseC.Image.WaterMark.ConsoleApp 
 
+### 命令说明
+
+```shell
+>WaterMark.exe R -h
+Description:
+  执行子命令
+Usage:
+  WaterMark run [options]
+
+Options:
+  --path <path>                                  文件/文件夹路径 []
+  --layout <bottom|onlyfill|surround|topbottom>  水印布局 [default: bottom]
+  --type <type>                                  图片类型 [default: jpg|png]
+  --ef, --export-folder <export-folder>          导出文件夹路径 []
+  --direction <lefttoright|toptobottom>          水印绘制方向 [default: lefttoright]
+  --size <size>                                  大小 [default: {Width=0, Height=0}]
+```
+  
+**`--path`**：必须要有值，可以指定单个图片或者文件夹下所有jpg|png文件  
+**`--layout`**：默认底部布局
+
 ### 运行实例
 
 ```batch
