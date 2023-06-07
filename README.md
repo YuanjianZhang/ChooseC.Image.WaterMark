@@ -1,6 +1,7 @@
 ## ChooseC.Image.WaterMark
 
-用于给图像添加相框，可以将照片信息【焦距、光圈、快门速度、ISO...】绘制添加到相框中里。
+用于给图像添加相框，可以将照片信息【焦距、光圈、快门速度、ISO...】绘制添加到相框中里。  
+想法来源于[semi-utils](https://github.com/leslievan/semi-utils)，想着用Csharp实现一个简单点，自己用的小程序，正好练练手。
 
 ### 项目结构
 
