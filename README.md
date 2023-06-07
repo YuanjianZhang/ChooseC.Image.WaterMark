@@ -4,14 +4,8 @@
 
 ### 项目结构
 
-----
-
-```batch project.tree
-
-功能代码：ChooseC.Image.WaterMark.Core
-
-控制台：ChooseC.Image.WaterMark.ConsoleApp
-```
+>功能代码：ChooseC.Image.WaterMark.Core  
+控制台：ChooseC.Image.WaterMark.ConsoleApp 
 
 ### 运行实例
 
@@ -25,6 +19,14 @@ WaterMark.exe R --path "demo\demo.jpg" --layout surround
 @REM 只填充
 WaterMark.exe R --path "demo\demo.jpg" --layout onlyfill
 ```
+
+#### 上下排版 topbottom
+
+![上下排版](demo/demo_230606223945.Png)
+
+#### 底部布局 bottom
+
+![左右排版](demo/demo_230606224019.Png)
 
 ### 常见问题
 
