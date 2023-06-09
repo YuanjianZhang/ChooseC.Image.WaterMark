@@ -18,20 +18,21 @@ Usage:
   WaterMark run [options]
 
 Options:
-  --path <path>                                  文件/文件夹路径 []
-  --layout <bottom|onlyfill|surround|topbottom>  水印布局 [default: bottom]
-  --type <type>                                  图片类型 [default: jpg|png]
-  --ef, --export-folder <export-folder>          导出文件夹路径 []
+  --path <path>                                  文件/文件夹路径 [支持相对路径和绝对路径]
+  --layout <bottom|onlyfill|surround|topbottom>  水印布局 [default: bottom，默认底部布局，可以不指定]
+  --type <type>                                  图片类型 [default: jpg|png，只支持jpg或png格式图片]
+  --ef, --export-folder <export-folder>          导出文件夹路径 [默认以程序执行路径为父目录，导出至Export文件夹中]
   --direction <lefttoright|toptobottom>          水印绘制方向 [default: lefttoright]
   --size <size>                                  大小 [default: {Width=0, Height=0}]
 ```
   
-**`--path`**：必须要有值，可以指定单个图片或者文件夹下所有jpg|png文件  
-**`--layout`**：默认底部布局
+**`--path`**：必须要有值，路径为文件路径时，只处理单文件，指定为目录时，处理文件夹下所有文件。
 
 ### 运行实例
 
 ```batch
+@REM 使用默认底部布局，处理当前程序执行路径下demo文件夹中所有图片
+WaterMark.exe R --path "demo"
 @REM 上下布局
 WaterMark.exe R --path "demo\demo.jpg" --layout topbottom
 @REM 底部布局
