@@ -1,6 +1,6 @@
 ## ChooseC.Image.WaterMark
 
-用于给图像添加相框，可以将照片信息【焦距、光圈、快门速度、ISO...】绘制添加到相框中里。  
+用于给图像添加相框的小程序，可以将照片信息【焦距、光圈、快门速度、ISO...】绘制添加到相框中里。  
 想法来源于[semi-utils](https://github.com/leslievan/semi-utils)，想着用Csharp实现一个简单点，自己用的小程序，正好练练手。
 
 ### 项目结构
@@ -10,7 +10,7 @@
 
 ### 命令说明
 
-```shell
+``` SHELL
 >WaterMark.exe R -h
 Description:
   执行子命令
@@ -33,9 +33,9 @@ Options:
 ```batch
 @REM 使用默认底部布局，处理当前程序执行路径下demo文件夹中所有图片
 WaterMark.exe R --path "demo"
-@REM 上下布局
+@REM 底部上下布局
 WaterMark.exe R --path "demo\demo.jpg" --layout topbottom
-@REM 底部布局
+@REM 底部左右布局
 WaterMark.exe R --path "demo\demo.jpg" --layout bottom
 @REM 底部环绕布局
 WaterMark.exe R --path "demo\demo.jpg" --layout surround
@@ -43,13 +43,12 @@ WaterMark.exe R --path "demo\demo.jpg" --layout surround
 WaterMark.exe R --path "demo\demo.jpg" --layout onlyfill
 ```
 
-#### 上下排版 topbottom
+#### 示例
 
-![上下排版](demo/demo_230606223945.Png)
-
-#### 底部布局 bottom
-
-![左右排版](demo/demo_230606224019.Png)
+|||
+|:--:|:--:|
+|上下排版|左右排版|
+|![上下排版](demo/demo_230606223945.Png)|![左右排版](demo/demo_230606224019.Png)|
 
 ### 常见问题
 
@@ -104,17 +103,15 @@ WaterMark.exe R --path "demo\demo.jpg" --layout onlyfill
 
 配置文件：
 
-+ [appsettings.develop.json](ChooseC.Image.WaterMark.ConsoleApp/appsettings.develop.json)
 + [appsettings.json](ChooseC.Image.WaterMark.ConsoleApp/appsettings.json)
 
-**启用`appsettings.develop.json`需要配置环境变量`ENV=develop`**
+**`Settings`：配置根节点名称**
 
-**`Settings`是配置根节点名称**
-
-----
-
-#### Settings
-
+<details>
+<summary>
+  Settings参数说明
+</summary>
+  
 #### exporttype
 
 导出图片类型
@@ -135,10 +132,10 @@ WaterMark.exe R --path "demo\demo.jpg" --layout onlyfill
 
 尺寸为实际输出图片中除去水印相框的尺寸【OnlyFill为实际输出图片尺寸，其它为图像内容尺寸】
 
->`(width > 0 && height == 0 ) || (width == 0 && height >0)`：根据原图的宽高比计算缩放后的图片，与导出尺寸有相差的部份，使用fillcolor填充。【处理后的图像，尺寸只能确保宽或高为指定值。】
->`(width == 0&&height == 0)`：不缩放图片
->`(width > 0 && height > 0)`：根据导出尺寸，在保持原图宽高比的前提下，计算原图的最大缩放比例，与导出尺寸有相差的部份，使用fillcolor填充。【处理后的图像，尺寸与配置相同】
->
+>`(width > 0 && height == 0 ) || (width == 0 && height >0)`：根据原图的宽高比计算缩放后的图片，与导出尺寸有相差的部份，使用fillcolor填充。【处理后的图像，尺寸只能确保宽或高为指定值。】  
+>`(width == 0&&height == 0)`：不缩放图片  
+>`(width > 0 && height > 0)`：根据导出尺寸，在保持原图宽高比的前提下，计算原图的最大缩放比例，与导出尺寸有相差的部份，使用fillcolor填充。【处理后的图像，尺寸与配置相同】  
+>  
 > > + exportsize
 > > + width
 > > + height
@@ -327,3 +324,4 @@ logo字体或水印信息字体
 #### fillratio
 
 填充相对原图占比
+</details>
